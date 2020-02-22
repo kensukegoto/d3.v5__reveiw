@@ -101,12 +101,7 @@ d3.json("./data/revenues.json").then(data =>{
       .attr("height",0)
       .remove()
 
-  rects
-    .transition(t)
-    .attr("x",d => x(d.month))
-    .attr("width",x.bandwidth)
-    .attr("y",d => y(d[which]))
-    .attr("height",d => (height - y(d[which])))
+
 
   rects.enter().append("rect")
     .attr("x",d => x(d.month))
@@ -114,6 +109,7 @@ d3.json("./data/revenues.json").then(data =>{
     .attr("fill","grey")
     .attr("y",y(0))
     .attr("height",0)
+    .merge(rects)
     .transition(t)
     .attr("y",d => y(d[which]))
     .attr("height",d => (height - y(d[which])))
