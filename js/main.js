@@ -67,11 +67,13 @@ d3.json("./data/revenues.json").then(data =>{
   let flag = true;
 
   d3.interval(()=>{
-    update();
+    update(data);
     flag = !flag;
   },1000)
 
-  function update(){
+  update(data)
+
+  function update(data){
 
     const which = flag ? "revenue" : "profit";
 
