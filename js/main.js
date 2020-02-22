@@ -15,6 +15,7 @@ const h = 400;
 const width = w - m.r - m.l;
 const height = h - m.t - m.b;
 
+const t = d3.transition().duration(750);
 
 let svg = d3.select("#chart-area")
   .append("svg")
@@ -61,6 +62,7 @@ d3.json("./data/revenues.json").then(data =>{
   let yAxis = g.append("g")
     .attr("class","top axis")
     
+  let rects = g.selectAll("rect")
 
   let flag = true;
 
@@ -76,35 +78,46 @@ d3.json("./data/revenues.json").then(data =>{
     x.domain(data.map(e => e.month))
     y.domain([0,d3.max(data,d=>d[which])])
 
-  xAxis
-    .call(d3.axisBottom(x))
-      .selectAll("text")
-      .attr("text-anchor","middle")
- 
-  yAxis
-    .call(
-      d3.axisLeft(y)
-      .tickFormat(d => "$" + d)
-    )
+    xAxis
+      .transition(t)
+      .call(d3.axisBottom(x))
+        .selectAll("text")
+        .attr("text-anchor","middle")
+  
+    yAxis
+      .transition(t)
+      .call(
+        d3.axisLeft(y)
+        .tickFormat(d => "$" + d)
+      )
 
-  let rects = g.selectAll("rect")
-    .data(data)
+    let rects = g.selectAll("rect")
+      .data(data)
 
-  rects.exit().remove()
+    rects.exit()
+      .attr("fill","red")
+      .transition(t)
+      .attr("y",y(0))
+      .attr("height",0)
+      .remove()
 
   rects
+    .transition(t)
     .attr("x",d => x(d.month))
     .attr("width",x.bandwidth)
     .attr("y",d => y(d[which]))
     .attr("height",d => (height - y(d[which])))
-    .attr("fill","grey")
 
   rects.enter().append("rect")
     .attr("x",d => x(d.month))
     .attr("width",x.bandwidth)
+    .attr("fill","grey")
+    .attr("y",y(0))
+    .attr("height",0)
+    .transition(t)
     .attr("y",d => y(d[which]))
     .attr("height",d => (height - y(d[which])))
-    .attr("fill","grey")
+    
 
   // rects.update().append("rect")
   //   .attr("x",d => x(d.month))
