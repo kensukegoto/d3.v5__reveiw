@@ -1,88 +1,90 @@
-const margin = {
-  left: 100,
-  right: 10,
-  top: 10,
-  bottom: 150
-}
+/*
+*    main.js
+*    Mastering Data Visualization with D3.js
+*    Project 1 - Star Break Coffee
+*/
 
-const width = 600 - margin.left - margin.right;
-const height = 400 - margin.top - margin.bottom;
+
+const m = {
+  t: 20,
+  l: 100,
+  r: 20,
+  b: 60
+};
+const w = 600;
+const h = 400;
+const width = w - m.r - m.l;
+const height = h - m.t - m.b;
+
 
 let svg = d3.select("#chart-area")
   .append("svg")
-  .attr("width",width + margin.left + margin.right)
-  .attr("height",height + margin.top + margin.bottom);
+  .attr("width", w)
+  .attr("height",h);
 
 let g = svg.append("g")
-  .attr("transform","translate(" + margin.left + "," + margin.top + ")")
+  .attr("transform","translate("+ m.l +","+ m.t +")");
 
 g.append("text")
-  .attr("class","x axis-label")
   .attr("x",width / 2)
-  .attr("y",height + 140)
-  .attr("font-size","20px")
+  .attr("y",height + 50)
   .attr("text-anchor","middle")
-  .text("The world's tallest buildings");
+  .attr("font-size","20px")
+  .text("Month")
 
 g.append("text")
-  .attr("class","y axis-label")
-  .attr("x",- (height / 2))
+  .attr("x",-(height / 2))
   .attr("y",-60)
-  .attr("font-size","20px")
-  .attr("text-anchor","middle")
   .attr("transform","rotate(-90)")
-  .text("Height (m)")
+  .attr("text-anchor","middle")
+  .attr("font-size","20px")
+  .text("Revenue")
 
-d3.json("./data/buildings.json").then(data => {
+
+d3.json("./data/revenues.json").then(data =>{
   
-  data.forEach(d => {
-    d.height = +d.height
+  data.forEach( e => {
+    e.revenue = + e.revenue;
+    e.revenue = + e.revenue;
   });
 
-  const x = d3.scaleBand()
-    .domain(data.map(d => d.name))
+  let x = d3.scaleBand()
+    .domain(data.map(e => e.month))
     .range([0,width])
-    .paddingInner(0.2)
-    .paddingOuter(0.2)
+    .paddingInner(.3)
+    .paddingOuter(.3)
 
-  const y = d3.scaleLinear()
-    .domain([0,d3.max(data,d => d.height)])
+  let y = d3.scaleLinear()
+    .domain([0,d3.max(data,d=>d.revenue)])
     .range([height,0])
 
-  const xAxisCall = d3.axisBottom(x);
+
+  let xAxisCall = d3.axisBottom(x);
   g.append("g")
-    .attr("class","x axis")
+    .attr("class","top axis")
     .attr("transform","translate(0,"+ height +")")
     .call(xAxisCall)
-    .selectAll("text")
-      .attr("y","10")
-      .attr("x","-5")
-      .attr("text-anchor","end")
-      .attr("transform","rotate(-40)")
+      .selectAll("text")
+      .attr("text-anchor","middle")
 
-  const yAxisCall = d3.axisLeft(y)
-    .ticks(3)
-    .tickFormat(d => {
-      return d + "m"
-    });
+  let yAxisCall = d3.axisLeft(y)
+    .tickFormat(d => "$" + d)
+    
   g.append("g")
-    .attr("class","y axis")
-    .call(yAxisCall);
+    .attr("class","top axis")
+    .call(yAxisCall)
 
   let rects = g.selectAll("rect")
     .data(data)
-    .enter()
-    .append("rect")
-    .attr("x", (d,i) => {
-      return x(d.name);
-    })
-    .attr("y",d => y(d.height))
+
+  rects.enter().append("rect")
+    .attr("x",d => x(d.month))
     .attr("width",x.bandwidth)
-    .attr("height", d => {
-      return height - y(d.height);
-    })
-    .attr("fill",() => "grey")
+    .attr("y",d => y(d.revenue))
+    .attr("height",d => (height - y(d.revenue)))
+    .attr("fill","grey")
 
-  
 
-})
+
+
+});
