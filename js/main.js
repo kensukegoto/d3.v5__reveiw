@@ -67,7 +67,8 @@ d3.json("./data/revenues.json").then(data =>{
   let flag = true;
 
   d3.interval(()=>{
-    update(data);
+    const newData = flag ? data : data.slice(1,3);
+    update(newData);
     flag = !flag;
   },1000)
 
@@ -94,7 +95,7 @@ d3.json("./data/revenues.json").then(data =>{
       )
 
     let rects = g.selectAll("rect")
-      .data(data)
+      .data(data,d => d.month)
 
     rects.exit()
       .attr("fill","red")
@@ -105,16 +106,18 @@ d3.json("./data/revenues.json").then(data =>{
 
 
 
-  rects.enter().append("rect")
-    .attr("x",d => x(d.month))
-    .attr("width",x.bandwidth)
-    .attr("fill","grey")
-    .attr("y",y(0))
-    .attr("height",0)
-    .merge(rects)
-    .transition(t)
-    .attr("y",d => y(d[which]))
-    .attr("height",d => (height - y(d[which])))
+    rects.enter().append("rect")
+      .attr("x",d => x(d.month))
+      .attr("width",x.bandwidth)
+      .attr("fill","grey")
+      .attr("y",y(0))
+      .attr("height",0)
+      .merge(rects)
+      .transition(t)
+      .attr("x",d => x(d.month))
+      .attr("width",x.bandwidth)
+      .attr("y",d => y(d[which]))
+      .attr("height",d => (height - y(d[which])))
     
 
   // rects.update().append("rect")
@@ -124,7 +127,7 @@ d3.json("./data/revenues.json").then(data =>{
   //   .attr("height",d => (height - y(d[which])))
   //   .attr("fill","grey")
     
-  yLabel.text(which.charAt(0).toUpperCase() + which.slice(1))
+    yLabel.text(which.charAt(0).toUpperCase() + which.slice(1))
 
   }
 
