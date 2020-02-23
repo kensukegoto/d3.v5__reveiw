@@ -62,9 +62,8 @@ d3.json("data/data.json").then(function(data){
 		])
 		.range([Math.pow(5,2) * Math.PI, Math.pow(50,2) * Math.PI]) // 直径： 最小 10px,最大100px
 
-
 	let c = d3.scaleOrdinal(d3.schemePastel1)
-		// .domain(["africa","americas","asia","europe"])
+		.domain(["africa","americas","asia","europe"])
 
 	const xAxis = g.append("g")
 		.attr("transform","translate(0,"+h2+")")
@@ -77,6 +76,24 @@ d3.json("data/data.json").then(function(data){
 
 	const yAxis = g.append("g")
 		.call(d3.axisLeft(y))
+
+	const continent = ["africa","americas","europe","asia"];
+	const legend = g.append("g")
+			.attr("transform","translate("+ (w2 - 10) +","+ (h2 - 125) +")")
+	continent.forEach((e,i)=>{
+		let row = legend.append("g")
+			.attr("transform","translate(0,"+ (i * 20) +")")
+		row.append("rect")
+			.attr("height",10)
+			.attr("width",10)
+			.attr("fill",c(e))
+		row.append("text")
+			.attr("x",-10)
+			.attr("y",10)
+			.attr("text-anchor","end")
+			.style("text-transform","capitalize")
+			.text(e)
+	})
 
 
 
