@@ -115,11 +115,6 @@ d3.json("data/data.json").then(function(data){
 
 	function update(data){
 
-		const continent = $("#continent-select").val();
-		data = data.filter(d =>{
-			if(continent === "all") return true;
-			else return d.continent === continent;
-		})
 
 		// エリアセレクトした場合はdurationを0にするとアニメーション無しに出来る
 		const t = d3.transition()
@@ -143,13 +138,21 @@ d3.json("data/data.json").then(function(data){
 	}
 
 
-	function step(){
-		idx++;
+	/**
+	 * 
+	 * @param {*} i idxをインクリメント
+	 */
+	function callUpdate(i){
+		idx += i;
 		$("#date-slider").slider("value",idx)
 		$("#year").text(data[idx].year)
 		let len = data.length;
 		let newData = data[idx % len].countries;
-		let year = data[idx % len].year;
+		const continent = $("#continent-select").val();
+		newData = newData.filter(d =>{
+			if(continent === "all") return true;
+			else return d.continent === continent;
+		})
 		update(newData)
 	}
 
@@ -159,7 +162,9 @@ d3.json("data/data.json").then(function(data){
 		.on("click",function(){
 			if($(this).text() === "Play"){
 				$(this).text("Pause");
-				interval = setInterval(step,100);
+				interval = setInterval(() => {
+					callUpdate(1);
+				},100);
 			}else{
 				$(this).text("Play");
 				clearInterval(interval);
@@ -169,18 +174,12 @@ d3.json("data/data.json").then(function(data){
 	$("#reset-button")
 		.on("click",function(){
 			idx = 0;
-			$("#date-slider").slider("value",idx)
-			$("#year").text(data[idx].year)
-			let len = data.length;
-			let newData = data[idx % len].countries;
-			update(newData)
+			callUpdate(0)
 		})
 
 	$("#continent-select")
 		.on("change",function(){
-			let len = data.length;
-			let newData = data[idx % len].countries;
-			update(newData)
+			callUpdate(0)
 		})
 
 	$("#date-slider").slider({
@@ -189,10 +188,7 @@ d3.json("data/data.json").then(function(data){
 		step: 1,
 		slide: (event,ui) => {
 			idx = ui.value;
-			$("#year").text(data[idx].year)
-			let len = data.length;
-			let newData = data[idx % len].countries;
-			update(newData)
+			callUpdate(0)
 		}
 	})
 
