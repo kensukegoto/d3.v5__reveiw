@@ -4,6 +4,9 @@
 *    Project 2 - Gapminder Clone
 */
 
+let interval = null;
+let idx = 0;
+
 const m = {
 	t: 20,
 	r: 20,
@@ -112,14 +115,15 @@ d3.json("data/data.json").then(function(data){
 
 	function update(data){
 
+		const continent = $("#continent-select").val();
+		data = data.filter(d =>{
+			if(continent === "all") return true;
+			else return d.continent === continent;
+		})
+
+		// エリアセレクトした場合はdurationを0にするとアニメーション無しに出来る
 		const t = d3.transition()
 			.duration(100);
-
-		// r
-		// .domain([
-		// 	d3.min(data,d => d.population) / 5 * Math.PI,
-		// 	d3.max(data,d => d.population) / 5 * Math.PI
-		// ])
 
 		let scat = g.selectAll("circle")
 			.data(data,d => d.country)
@@ -138,18 +142,38 @@ d3.json("data/data.json").then(function(data){
 			
 	}
 
-	let idx = 0;
-	let len = data.length;
 
-	d3.interval(()=>{
-
+	function step(){
 		idx++;
+		let len = data.length;
 		let newData = data[idx % len].countries;
 		let year = data[idx % len].year;
 		update(newData)
+	}
 
-	},100)
+	update(data[0].countries);
 
-	update(data[idx % len].countries);
+	$("#play-button")
+		.on("click",function(){
+			if($(this).text() === "Play"){
+				$(this).text("Pause");
+				interval = setInterval(step,100);
+			}else{
+				$(this).text("Play");
+				clearInterval(interval);
+			}
+			
+		})
+	$("#reset-button")
+		.on("click",function(){
+			idx = 0;
+		})
+
+	$("#continent-select")
+		.on("change",function(){
+			let len = data.length;
+			let newData = data[idx % len].countries;
+			update(newData)
+		})
 
 })
