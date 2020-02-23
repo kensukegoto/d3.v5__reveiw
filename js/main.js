@@ -11,8 +11,8 @@ const m = {
 	l: 100
 };
 
-const w = 600;
-const w2 = 600 - m.r - m.l;
+const w = 800;
+const w2 = w - m.r - m.l;
 const h = 400;
 const h2 = h - m.t - m.b;
 
@@ -38,8 +38,6 @@ d3.json("data/data.json").then(function(data){
 	});
 
 
-
-
 	let x = d3.scaleLog()
 		.domain([300,150000])
 		.range([0,w2])
@@ -52,8 +50,24 @@ d3.json("data/data.json").then(function(data){
 	let c = d3.scaleOrdinal(d3.schemePastel1)
 		// .domain(["africa","americas","asia","europe"])
 
+	const xAxis = g.append("g")
+		.attr("transform","translate(0,"+h2+")")
+		.call(
+			d3.axisBottom(x)
+				.tickValues([400,4000,40000])
+				.tickFormat(d => d)
+		
+		)
+
+	const yAxis = g.append("g")
+		.call(d3.axisLeft(y))
+
+
 
 	function update(data){
+
+		const t = d3.transition()
+			.duration(100);
 
 		r
 		.domain([
@@ -68,6 +82,7 @@ d3.json("data/data.json").then(function(data){
 
 		scat.enter().append("circle")
 			.merge(scat)
+			.transition(t)
 			.attr("cx",d => x(d.income))
 			.attr("cy",d => y(d.life_exp))
 			.attr("r",d => r(d.population))
