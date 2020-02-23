@@ -66,7 +66,7 @@ d3.json("data/data.json").then(function(data){
 
 
 	let x = d3.scaleLog()
-		.domain([300,150000])
+		.domain([130,150000])
 		.range([0,w2])
 	let y = d3.scaleLinear()
 		.domain([0,90])
