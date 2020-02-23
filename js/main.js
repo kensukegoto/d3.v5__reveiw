@@ -145,6 +145,8 @@ d3.json("data/data.json").then(function(data){
 
 	function step(){
 		idx++;
+		$("#date-slider").slider("value",idx)
+		$("#year").text(data[idx].year)
 		let len = data.length;
 		let newData = data[idx % len].countries;
 		let year = data[idx % len].year;
@@ -167,6 +169,11 @@ d3.json("data/data.json").then(function(data){
 	$("#reset-button")
 		.on("click",function(){
 			idx = 0;
+			$("#date-slider").slider("value",idx)
+			$("#year").text(data[idx].year)
+			let len = data.length;
+			let newData = data[idx % len].countries;
+			update(newData)
 		})
 
 	$("#continent-select")
@@ -175,5 +182,18 @@ d3.json("data/data.json").then(function(data){
 			let newData = data[idx % len].countries;
 			update(newData)
 		})
+
+	$("#date-slider").slider({
+		min: 0,
+		max: data.length - 1,
+		step: 1,
+		slide: (event,ui) => {
+			idx = ui.value;
+			$("#year").text(data[idx].year)
+			let len = data.length;
+			let newData = data[idx % len].countries;
+			update(newData)
+		}
+	})
 
 })
