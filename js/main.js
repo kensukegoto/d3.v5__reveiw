@@ -28,15 +28,20 @@ let g = svg.append("g")
 d3.json("data/data.json").then(function(data){
 	
 	// データ整形
-	data.forEach(d => {
-		d.countries = d.countries.filter(c => {
-			let flg = Object.keys(c).filter(k => {
-				return c[k] === null;
-			});
-			return flg.length === 0;
-		})
-	});
+	data = data.map(function(year){
 
+		const countries = year["countries"].filter(function(country){
+				var dataExists = (country.income && country.life_exp);
+				return dataExists
+		}).map(function(country){
+				country.income = +country.income;
+				country.life_exp = +country.life_exp;
+				return country;            
+		})
+		return {
+			year: +year.year,countries
+		}
+	});
 
 	let x = d3.scaleLog()
 		.domain([300,150000])
