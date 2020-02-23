@@ -25,6 +25,19 @@ let svg = d3.select("#chart-area")
 let g = svg.append("g")
 	.attr("transform","translate("+m.l+","+m.t+")")
 
+const tip = d3.tip().attr("class","d3-tip")
+	.html(d => {
+
+		let text = "<strong>Country:</strong> <span style='color:red;'>"+d.country+"</span><br>";
+		text += "<strong>Countinent:</strong> <span style='color:red;text-transfrom:capitalize;'>"+d.continent+"</span><br>";
+		text += "<strong>Life Expectancy:</strong> <span style='color:red;'>"+d.life_exp+"</span><br>";
+		text += "<strong>GDP Per Capital:</strong> <span style='color:red;'>"+d.income+"</span><br>";
+		text += "<strong>Population:</strong> <span style='color:red;'>"+d.population+"</span>";
+		return text;
+	})
+	
+g.call(tip)
+
 d3.json("data/data.json").then(function(data){
 	
 	// データ整形
@@ -114,12 +127,15 @@ d3.json("data/data.json").then(function(data){
 		scat.exit().remove()
 
 		scat.enter().append("circle")
+			.attr("fill",d => c(d.continent))
+			.on("mouseover",tip.show)
+			.on("mouseout",tip.hide)
 			.merge(scat)
 			.transition(t)
 			.attr("cx",d => x(d.income))
 			.attr("cy",d => y(d.life_exp))
 			.attr("r",d => Math.sqrt(r(d.population)/Math.PI))
-			.attr("fill",d => c(d.continent))
+			
 	}
 
 	let idx = 0;
