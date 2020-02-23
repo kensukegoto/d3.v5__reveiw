@@ -16,6 +16,7 @@ const w2 = 600 - m.r - m.l;
 const h = 400;
 const h2 = h - m.t - m.b;
 
+
 let svg = d3.select("#chart-area")
 	.append("svg")
 	.attr("height",h)
@@ -38,6 +39,7 @@ d3.json("data/data.json").then(function(data){
 
 
 
+
 	let x = d3.scaleLog()
 		.domain([300,150000])
 		.range([0,w2])
@@ -46,6 +48,9 @@ d3.json("data/data.json").then(function(data){
 		.range([h2,0])
 	let r = d3.scaleLinear()
 		.range([5,25])
+
+	let c = d3.scaleOrdinal(d3.schemePastel1)
+		// .domain(["africa","americas","asia","europe"])
 
 
 	function update(data){
@@ -57,21 +62,16 @@ d3.json("data/data.json").then(function(data){
 		])
 
 		let scat = g.selectAll("circle")
-			.data(data)
+			.data(data,d => d.country)
 
 		scat.exit().remove()
 
-		scat
-			.attr("cx",d => x(d.income))
-			.attr("cy",d => y(d.life_exp))
-			.attr("r",d => r(d.population))
-			.attr("fill","blue")
-
 		scat.enter().append("circle")
+			.merge(scat)
 			.attr("cx",d => x(d.income))
 			.attr("cy",d => y(d.life_exp))
 			.attr("r",d => r(d.population))
-			.attr("fill","blue")
+			.attr("fill",d => c(d.continent))
 	}
 
 	let idx = 0;
@@ -79,12 +79,14 @@ d3.json("data/data.json").then(function(data){
 
 	d3.interval(()=>{
 
+		idx++;
 		let newData = data[idx % len].countries;
 		let year = data[idx % len].year;
 		update(newData)
-		idx++;
 
 	},100)
+
+	update(data[idx % len].countries);
 
 
 
